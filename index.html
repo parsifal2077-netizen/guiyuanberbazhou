@@ -286,6 +286,41 @@
       animation: pulseHalo 3.4s ease-in-out infinite;
     }
 
+    /* Cake click floating small-text popup bubble */
+    @keyframes floatPopupUp {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 8px) scale(0.82);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -4px) scale(1.03);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -28px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -42px) scale(0.94);
+      }
+    }
+    .cake-float-popup {
+      position: absolute;
+      pointer-events: none;
+      z-index: 45;
+      white-space: nowrap;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 253, 254, 0.96);
+      border: 1px solid #F2B5C8;
+      box-shadow: 0 8px 20px -4px rgba(217, 127, 156, 0.35);
+      color: #54343F;
+      font-size: 11.5px;
+      font-weight: 600;
+      animation: floatPopupUp 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
     /* Custom thin scrollbar for letter if needed on tiny viewports */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -301,7 +336,7 @@
     <div id="phone-shell" class="iphone16pro-shell">
 
       <!-- Ambient Falling Rose Petals & Sparkle Canvas -->
-      <canvas id="petal-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+      <canvas id="petal-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-30"></canvas>
 
       <!-- Soft Ambient Glow Blobs -->
       <div class="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-[#FADCE6]/55 blur-3xl pointer-events-none"></div>
@@ -566,59 +601,142 @@
           </p>
         </div>
 
-        <!-- Interactive White-Pink Rose Birthday Cake SVG -->
-        <div class="stagger-item stagger-2 pearl-card rounded-3xl p-4 my-auto flex flex-col items-center justify-center relative overflow-hidden">
-          <div id="wish-aura" class="absolute inset-0 bg-gradient-to-b from-[#FFE6EE]/50 via-transparent to-transparent pointer-events-none transition-opacity duration-700"></div>
+        <!-- Interactive Classic Multi-Tier Rose Birthday Cake + Small Text Popups -->
+        <div id="cake-card-stage" class="stagger-item stagger-2 pearl-card rounded-3xl p-4 my-auto flex flex-col items-center justify-center relative overflow-hidden">
+          <div id="wish-aura" class="absolute inset-0 bg-gradient-to-b from-[#FFE2EC]/65 via-[#FFF7FA]/30 to-transparent pointer-events-none transition-opacity duration-700"></div>
 
-          <div class="relative w-52 h-44 flex items-center justify-center cursor-pointer" id="cake-interactive-area" title="点击吹灭蜡烛">
-            <svg viewBox="0 0 220 190" class="w-full h-full drop-shadow-sm">
-              <!-- Soft Plate -->
-              <ellipse cx="110" cy="170" rx="86" ry="12" fill="#F2DCE4" />
-              <ellipse cx="110" cy="167" rx="78" ry="9" fill="#FFFDFB" />
+          <!-- Floating Small-Text Popup Container (Popups appear when clicking cake) -->
+          <div id="cake-popup-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-40"></div>
 
-              <!-- Bottom Cake Tier (Blush Pink) -->
-              <rect x="44" y="114" width="132" height="52" rx="14" fill="#FADCE6" stroke="#FFFFFF" stroke-width="2" />
-              <!-- Cream Frosting Drips Bottom -->
-              <path d="M44 124 Q55 134 66 124 T88 124 T110 124 T132 124 T154 124 T176 124 L176 114 L44 114 Z" fill="#FFFDFB" />
+          <!-- Delicate Wish Toast Popup Banner (Appears on click) -->
+          <div id="cake-wish-toast" class="relative z-30 mb-1 px-3.5 py-1.5 rounded-full bg-white/95 border border-[#F2B5C8] shadow-[0_6px_20px_rgba(217,127,156,0.25)] text-[11.5px] text-[#5E3E48] font-medium flex items-center gap-1.5 transition-all duration-300 opacity-95">
+            <span id="cake-toast-icon" class="text-xs">✨</span>
+            <span id="cake-toast-text" class="serif-cn tracking-wide">轻触蛋糕，吹灭烛光并弹出十九岁心愿小字</span>
+          </div>
 
-              <!-- Top Cake Tier (Ivory Rose) -->
-              <rect x="62" y="74" width="96" height="44" rx="12" fill="#FFF5F8" stroke="#FFFFFF" stroke-width="2" />
-              <!-- Cream Frosting Drips Top -->
-              <path d="M62 84 Q74 93 86 84 T110 84 T134 84 T158 84 L158 74 L62 74 Z" fill="#F2B5C8" opacity="0.65" />
+          <div class="relative w-60 h-52 flex items-center justify-center cursor-pointer select-none group" id="cake-interactive-area" title="点击蛋糕触发心愿小字弹窗">
+            <svg viewBox="0 0 260 225" class="w-full h-full drop-shadow-[0_12px_22px_rgba(180,110,135,0.2)] transition-transform duration-300 group-hover:scale-[1.03] group-active:scale-95">
+              <defs>
+                <linearGradient id="tierBottomGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FCE8EF" />
+                  <stop offset="50%" stop-color="#F7CFE0" />
+                  <stop offset="100%" stop-color="#EFAEC6" />
+                </linearGradient>
+                <linearGradient id="tierMidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FFFDFB" />
+                  <stop offset="60%" stop-color="#FDF0F5" />
+                  <stop offset="100%" stop-color="#F7D6E2" />
+                </linearGradient>
+                <linearGradient id="tierTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FFFFFF" />
+                  <stop offset="100%" stop-color="#FCE8EF" />
+                </linearGradient>
+                <linearGradient id=" frostingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#FFFDFB" />
+                  <stop offset="50%" stop-color="#FFF7FA" />
+                  <stop offset="100%" stop-color="#FCEEF3" />
+                </linearGradient>
+                <radialGradient id="flameHaloGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(255, 215, 130, 0.75)" />
+                  <stop offset="60%" stop-color="rgba(255, 180, 150, 0.28)" />
+                  <stop offset="100%" stop-color="rgba(255, 180, 150, 0)" />
+                </radialGradient>
+              </defs>
 
-              <!-- Little Rosebuds on Cake -->
-              <circle cx="78" cy="112" r="5" fill="#E598B2" />
-              <circle cx="110" cy="112" r="5.5" fill="#D97F9C" />
-              <circle cx="142" cy="112" r="5" fill="#E598B2" />
+              <!-- Pedestal Cake Stand -->
+              <path d="M98 192 L162 192 L174 208 L86 208 Z" fill="#F0D4DF" stroke="#FFFFFF" stroke-width="1.5" />
+              <rect x="74" y="206" width="112" height="7" rx="3.5" fill="#E5B8C8" />
+              <ellipse cx="130" cy="190" rx="102" ry="13" fill="#E8C2D0" />
+              <ellipse cx="130" cy="187" rx="96" ry="10" fill="#FFFDFB" stroke="#F5DCE5" stroke-width="1.5" />
 
-              <!-- "19" Plaque on Cake -->
-              <rect x="92" y="132" width="36" height="22" rx="8" fill="#FFFDFB" stroke="#F2B5C8" stroke-width="1.2" />
-              <text x="110" y="147" text-anchor="middle" fill="#B85D7C" font-family="Cormorant Garamond, serif" font-weight="700" font-size="15">19</text>
+              <!-- Tier 1: Bottom Grand Tier -->
+              <path d="M46 132 L214 132 L214 182 C214 190 176 195 130 195 C84 195 46 190 46 182 Z" fill="url(#tierBottomGrad)" stroke="#FFFFFF" stroke-width="2" />
+              <ellipse cx="130" cy="132" rx="84" ry="10" fill="#FFF8FA" />
+              <!-- Bottom Tier Cream Scallops & Drips -->
+              <path d="M46 133 Q58 148 70 135 Q82 150 94 135 Q106 149 118 135 Q130 151 142 135 Q154 149 166 135 Q178 150 190 135 Q202 148 214 133 L214 128 L46 128 Z" fill="#FFFDFB" />
+              <!-- Pearl Garland on Bottom Tier -->
+              <g fill="#FFFDFB" stroke="#E598B2" stroke-width="0.8">
+                <circle cx="54" cy="184" r="3.2" /><circle cx="64" cy="186" r="3.2" /><circle cx="74" cy="187.5" r="3.2" />
+                <circle cx="84" cy="189" r="3.2" /><circle cx="94" cy="190" r="3.2" /><circle cx="104" cy="191" r="3.2" />
+                <circle cx="114" cy="191.5" r="3.2" /><circle cx="124" cy="192" r="3.2" /><circle cx="136" cy="192" r="3.2" />
+                <circle cx="146" cy="191.5" r="3.2" /><circle cx="156" cy="191" r="3.2" /><circle cx="166" cy="190" r="3.2" />
+                <circle cx="176" cy="189" r="3.2" /><circle cx="186" cy="187.5" r="3.2" /><circle cx="196" cy="186" r="3.2" />
+                <circle cx="206" cy="184" r="3.2" />
+              </g>
 
-              <!-- Candle Body -->
-              <rect x="105" y="38" width="10" height="36" rx="4" fill="#FFFDFB" stroke="#F2B5C8" stroke-width="1.5" />
-              <line x1="106" y1="48" x2="114" y2="52" stroke="#F2B5C8" stroke-width="1.5" />
-              <line x1="106" y1="60" x2="114" y2="64" stroke="#F2B5C8" stroke-width="1.5" />
+              <!-- Tier 2: Middle Ivory-Pink Tier -->
+              <path d="M68 88 L192 88 L192 130 C192 136 164 140 130 140 C96 140 68 136 68 130 Z" fill="url(#tierMidGrad)" stroke="#FFFFFF" stroke-width="2" />
+              <ellipse cx="130" cy="88" rx="62" ry="8" fill="#FFFDFB" />
+              <!-- Middle Tier Pink Cream Drips -->
+              <path d="M68 89 Q78 102 88 90 Q99 104 110 90 Q120 102 130 90 Q140 102 150 90 Q161 104 172 90 Q182 102 192 89 L192 84 L68 84 Z" fill="#F4B8CB" opacity="0.85" />
 
-              <!-- Candle Wick -->
-              <line x1="110" y1="33" x2="110" y2="38" stroke="#5E3E48" stroke-width="1.5" />
+              <!-- Sculpted Rosebuds Around Middle Base -->
+              <g>
+                <circle cx="80" cy="129" r="6" fill="#F2B5C8" /><circle cx="80" cy="129" r="3.2" fill="#D97F9C" />
+                <circle cx="104" cy="132" r="5.5" fill="#FADCE6" /><circle cx="104" cy="132" r="2.8" fill="#E598B2" />
+                <circle cx="130" cy="133" r="6.5" fill="#F2B5C8" /><circle cx="130" cy="133" r="3.5" fill="#C96A8A" />
+                <circle cx="156" cy="132" r="5.5" fill="#FADCE6" /><circle cx="156" cy="132" r="2.8" fill="#E598B2" />
+                <circle cx="180" cy="129" r="6" fill="#F2B5C8" /><circle cx="180" cy="129" r="3.2" fill="#D97F9C" />
+              </g>
 
-              <!-- Flickering Flame Group -->
+              <!-- Golden-Rose "19" Medallion on Bottom Tier -->
+              <ellipse cx="130" cy="162" rx="26" ry="16" fill="#FFFDFB" stroke="#E598B2" stroke-width="1.8" />
+              <ellipse cx="130" cy="162" rx="22" ry="12.5" fill="none" stroke="#F5D0DD" stroke-width="0.9" stroke-dasharray="2 2" />
+              <text x="130" y="168" text-anchor="middle" fill="#B85D7C" font-family="Cormorant Garamond, serif" font-weight="700" font-size="18" letter-spacing="1">19</text>
+
+              <!-- Top Crown Cream Rosettes -->
+              <circle cx="84" cy="84" r="6.5" fill="#FFFDFB" stroke="#F5D0DD" stroke-width="1" />
+              <circle cx="106" cy="86" r="7" fill="#FFF5F8" stroke="#F5D0DD" stroke-width="1" />
+              <circle cx="130" cy="87" r="7.5" fill="#FFFDFB" stroke="#F5D0DD" stroke-width="1" />
+              <circle cx="154" cy="86" r="7" fill="#FFF5F8" stroke="#F5D0DD" stroke-width="1" />
+              <circle cx="176" cy="84" r="6.5" fill="#FFFDFB" stroke="#F5D0DD" stroke-width="1" />
+
+              <!-- Three Birthday Candles (Left, Center Main, Right) -->
+              <!-- Left Candle -->
+              <rect x="98" y="48" width="8" height="34" rx="3.5" fill="#FFFDFB" stroke="#F2B5C8" stroke-width="1.3" />
+              <line x1="99" y1="57" x2="105" y2="61" stroke="#F2B5C8" stroke-width="1.4" />
+              <line x1="99" y1="68" x2="105" y2="72" stroke="#F2B5C8" stroke-width="1.4" />
+              <line x1="102" y1="43" x2="102" y2="48" stroke="#5E3E48" stroke-width="1.4" />
+
+              <!-- Center Main Candle -->
+              <rect x="125" y="40" width="10" height="42" rx="4" fill="#FFFDFB" stroke="#E598B2" stroke-width="1.5" />
+              <line x1="126" y1="50" x2="134" y2="55" stroke="#F2B5C8" stroke-width="1.6" />
+              <line x1="126" y1="62" x2="134" y2="67" stroke="#F2B5C8" stroke-width="1.6" />
+              <line x1="130" y1="34" x2="130" y2="40" stroke="#5E3E48" stroke-width="1.6" />
+
+              <!-- Right Candle -->
+              <rect x="154" y="48" width="8" height="34" rx="3.5" fill="#FFFDFB" stroke="#F2B5C8" stroke-width="1.3" />
+              <line x1="155" y1="57" x2="161" y2="61" stroke="#F2B5C8" stroke-width="1.4" />
+              <line x1="155" y1="68" x2="161" y2="72" stroke="#F2B5C8" stroke-width="1.4" />
+              <line x1="158" y1="43" x2="158" y2="48" stroke="#5E3E48" stroke-width="1.4" />
+
+              <!-- Flickering Flame Group (All 3 Candles) -->
               <g id="candle-flame-group" class="candle-flame">
-                <circle cx="110" cy="24" r="14" fill="rgba(255, 208, 138, 0.35)" />
-                <path d="M110 10 C115 18 117 26 110 33 C103 26 105 18 110 10 Z" fill="#FFB35C" />
-                <path d="M110 16 C113 21 113 26 110 31 C107 26 107 21 110 16 Z" fill="#FFF8E7" />
+                <!-- Center Flame -->
+                <circle cx="130" cy="24" r="22" fill="url(#flameHaloGrad)" />
+                <path d="M130 9 C136 18 138 27 130 35 C122 27 124 18 130 9 Z" fill="#FFB04F" />
+                <path d="M130 15 C133.5 21 134 27 130 32 C126 27 126.5 21 130 15 Z" fill="#FFF9E6" />
+                <!-- Left Flame -->
+                <circle cx="102" cy="34" r="15" fill="url(#flameHaloGrad)" />
+                <path d="M102 22 C106.5 29 108 36 102 43 C96 36 97.5 29 102 22 Z" fill="#FFB04F" />
+                <path d="M102 27 C104.5 31 105 36 102 40 C99 36 99.5 31 102 27 Z" fill="#FFF9E6" />
+                <!-- Right Flame -->
+                <circle cx="158" cy="34" r="15" fill="url(#flameHaloGrad)" />
+                <path d="M158 22 C162.5 29 164 36 158 43 C152 36 153.5 29 158 22 Z" fill="#FFB04F" />
+                <path d="M158 27 C160.5 31 161 36 158 40 C155 36 155.5 31 158 27 Z" fill="#FFF9E6" />
               </g>
 
               <!-- Smoke Wisp (Hidden initially, shown after blowing out) -->
               <g id="candle-smoke-group" class="opacity-0 transition-opacity duration-700">
-                <path d="M110 30 Q104 20 112 12 Q118 5 109 -2" fill="none" stroke="#B89AA4" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" />
+                <path d="M102 40 Q96 30 104 22 Q110 14 101 8" fill="none" stroke="#B89AA4" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 3" />
+                <path d="M130 32 Q123 20 132 11 Q139 3 129 -4" fill="none" stroke="#B89AA4" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3" />
+                <path d="M158 40 Q152 30 160 22 Q166 14 157 8" fill="none" stroke="#B89AA4" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3 3" />
               </g>
             </svg>
           </div>
 
-          <p id="wish-status-label" class="serif-cn text-xs text-[#6E4552] text-center mt-1">
-            🕯️ 烛光摇曳中 · 许好心愿后点击下方按钮吹灭蜡烛
+          <p id="wish-status-label" class="serif-cn text-xs text-[#6E4552] text-center mt-0.5">
+            🕯️ 烛光摇曳中 · 点击蛋糕或下方按钮吹灭蜡烛，每次点击都有心愿小字弹窗
           </p>
         </div>
 
@@ -666,7 +784,8 @@
           </p>
 
           <div class="pt-2 text-right">
-            <p class="serif-en italic text-sm text-[#8C6773]">Best wishes for your 19th</p>
+            <p class="serif-cn text-sm font-semibold text-[#4A323A] tracking-wide">—— 小白</p>
+            <p class="serif-en italic text-xs text-[#8C6773] mt-0.5">Best wishes for your 19th</p>
             <p class="text-[11px] text-[#9E6B7B] mt-0.5">2026.10.16</p>
           </div>
         </div>
@@ -942,11 +1061,26 @@
       renderSignsState();
 
       // =====================================================
-      // SLIDE 04: 生日蛋糕吹蜡烛互动
+      // SLIDE 04: 生日蛋糕吹蜡烛互动 + 点击小字弹窗
       // =====================================================
       let candleBlown = false;
+      let cakeWishIdx = 0;
+      const cakeWishMessages = [
+        '✨ 十九岁心愿已收好，一定会悄悄实现',
+        '🌸 祝刘金 19 岁生日快乐，天天开心！',
+        '🎂 愿你眼里总有星辰，身边常伴微风',
+        '💫 十九岁的每一天，都要闪闪发光呀',
+        '🌷 烦恼全吹散，美好与好运统统向你奔来',
+        '🍬 甜度满分！愿十九岁所愿皆所得'
+      ];
+
       const blowCandleBtn = document.getElementById('blow-candle-btn');
       const cakeArea = document.getElementById('cake-interactive-area');
+      const cakeCardStage = document.getElementById('cake-card-stage');
+      const cakePopupLayer = document.getElementById('cake-popup-layer');
+      const cakeWishToast = document.getElementById('cake-wish-toast');
+      const cakeToastIcon = document.getElementById('cake-toast-icon');
+      const cakeToastText = document.getElementById('cake-toast-text');
       const flameGroup = document.getElementById('candle-flame-group');
       const smokeGroup = document.getElementById('candle-smoke-group');
       const wishStatusLabel = document.getElementById('wish-status-label');
@@ -954,10 +1088,41 @@
       const blowBtnIcon = document.getElementById('blow-btn-icon');
       const wishAura = document.getElementById('wish-aura');
 
-      function toggleCandleWish() {
+      function spawnCakeSmallPopup(customX, customY) {
+        if (!cakePopupLayer || !cakeCardStage) return;
+        const msg = cakeWishMessages[cakeWishIdx % cakeWishMessages.length];
+        cakeWishIdx++;
+
+        // Update top toast pill as well
+        if (cakeToastText && cakeToastIcon) {
+          cakeToastIcon.textContent = '💌';
+          cakeToastText.textContent = msg;
+          cakeWishToast.classList.add('scale-105');
+          setTimeout(() => cakeWishToast.classList.remove('scale-105'), 240);
+        }
+
+        // Create floating small-text popup bubble
+        const stageRect = cakeCardStage.getBoundingClientRect();
+        const bubble = document.createElement('div');
+        bubble.className = 'cake-float-popup serif-cn';
+        bubble.textContent = msg;
+
+        const relX = customX ? Math.min(Math.max(customX - stageRect.left, 90), stageRect.width - 90) : (stageRect.width / 2 + (Math.random() - 0.5) * 36);
+        const relY = customY ? Math.min(Math.max(customY - stageRect.top, 60), stageRect.height - 60) : (stageRect.height * 0.42);
+
+        bubble.style.left = `${relX}px`;
+        bubble.style.top = `${relY}px`;
+        cakePopupLayer.appendChild(bubble);
+
+        setTimeout(() => {
+          if (bubble.parentNode) bubble.parentNode.removeChild(bubble);
+        }, 2150);
+      }
+
+      function blowOutCandleWithPopup(clientX, clientY) {
         const rect = cakeArea.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 3;
+        const cx = clientX || (rect.left + rect.width / 2);
+        const cy = clientY || (rect.top + rect.height / 3);
 
         if (!candleBlown) {
           candleBlown = true;
@@ -966,34 +1131,56 @@
           flameGroup.style.transition = 'all 0.4s ease';
           smokeGroup.classList.remove('opacity-0');
           wishAura.style.opacity = '0.15';
-          wishStatusLabel.textContent = '✨ 蜡烛已吹灭！十九岁的心愿一定会悄悄实现 ✨';
+          wishStatusLabel.textContent = '✨ 蜡烛已吹灭！继续轻触蛋糕可弹出更多心愿小字 ✨';
           blowBtnIcon.textContent = '🕯️';
           blowBtnText.textContent = '重新点亮生日蜡烛';
-          spawnBurstParticles(cx, cy, 36);
+          spawnBurstParticles(cx, cy, 38);
+          spawnPetalShower(18);
+          spawnCakeSmallPopup(cx, cy);
+        } else {
+          // Clicking cake while already blown out pops up another sweet small-text wish!
+          spawnBurstParticles(cx, cy, 22);
+          spawnCakeSmallPopup(cx, cy);
+        }
+      }
+
+      cakeArea.addEventListener('click', (e) => {
+        blowOutCandleWithPopup(e.clientX, e.clientY);
+      });
+
+      blowCandleBtn.addEventListener('click', () => {
+        const rect = cakeArea.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 3;
+
+        if (!candleBlown) {
+          blowOutCandleWithPopup(cx, cy);
         } else {
           candleBlown = false;
           flameGroup.style.opacity = '1';
           flameGroup.style.transform = 'scale(1)';
           smokeGroup.classList.add('opacity-0');
           wishAura.style.opacity = '1';
-          wishStatusLabel.textContent = '🕯️ 烛光摇曳中 · 许好心愿后点击下方按钮吹灭蜡烛';
+          wishStatusLabel.textContent = '🕯️ 烛光已重新点亮 · 点击蛋糕或按钮许下心愿吧';
           blowBtnIcon.textContent = '🎂';
           blowBtnText.textContent = '吹灭蜡烛 · 许下19岁心愿';
-          spawnBurstParticles(cx, cy, 14);
+          if (cakeToastText && cakeToastIcon) {
+            cakeToastIcon.textContent = '🕯️';
+            cakeToastText.textContent = '烛光摇曳 · 点击蛋糕触发心愿小字弹窗';
+          }
+          spawnBurstParticles(cx, cy, 16);
         }
-      }
-
-      blowCandleBtn.addEventListener('click', toggleCandleWish);
-      cakeArea.addEventListener('click', toggleCandleWish);
+      });
 
       // =====================================================
-      // SLIDE 05: 花瓣雨 & 重新放映
+      // SLIDE 05: 花瓣雨 (在信笺上方飘落) & 重新放映
       // =====================================================
       const petalBurstBtn = document.getElementById('petal-burst-btn');
       const replaySlidesBtn = document.getElementById('replay-slides-btn');
 
       petalBurstBtn.addEventListener('click', () => {
-        spawnBurstParticles(window.innerWidth / 2, window.innerHeight / 3, 40);
+        spawnPetalShower(42);
+        spawnBurstParticles(window.innerWidth / 2, window.innerHeight / 3, 28);
       });
 
       replaySlidesBtn.addEventListener('click', () => {
@@ -1020,13 +1207,31 @@
       resizeCanvas();
 
       const petals = [];
+      const showerPetals = [];
       const burstParticles = [];
       const petalColors = [
-        'rgba(250, 220, 230, 0.75)',
-        'rgba(242, 181, 200, 0.65)',
-        'rgba(255, 245, 248, 0.85)',
-        'rgba(232, 155, 180, 0.55)'
+        'rgba(250, 220, 230, 0.82)',
+        'rgba(242, 181, 200, 0.78)',
+        'rgba(255, 240, 245, 0.9)',
+        'rgba(217, 127, 156, 0.68)'
       ];
+
+      function spawnPetalShower(count) {
+        for (let i = 0; i < count; i++) {
+          showerPetals.push({
+            x: Math.random() * cw,
+            y: -15 - Math.random() * (ch * 0.45),
+            r: 5.5 + Math.random() * 6.5,
+            vy: 1.3 + Math.random() * 1.9,
+            vx: (Math.random() - 0.5) * 1.4,
+            angle: Math.random() * Math.PI * 2,
+            spin: (Math.random() - 0.5) * 0.045,
+            swaySpeed: 0.02 + Math.random() * 0.025,
+            alpha: 0.95,
+            color: petalColors[i % petalColors.length]
+          });
+        }
+      }
 
       for (let i = 0; i < 18; i++) {
         petals.push({
@@ -1085,6 +1290,32 @@
           ctx.fillStyle = p.color;
           ctx.beginPath();
           ctx.ellipse(0, 0, p.r, p.r * 0.62, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Draw rich petal shower (above the letter card)
+        for (let i = showerPetals.length - 1; i >= 0; i--) {
+          const sp = showerPetals[i];
+          sp.y += sp.vy;
+          sp.x += sp.vx + Math.sin(sp.y * sp.swaySpeed) * 0.9;
+          sp.angle += sp.spin;
+          if (sp.y > ch * 0.82) {
+            sp.alpha -= 0.025;
+          }
+          if (sp.y > ch + 20 || sp.alpha <= 0) {
+            showerPetals.splice(i, 1);
+            continue;
+          }
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, sp.alpha);
+          ctx.translate(sp.x, sp.y);
+          ctx.rotate(sp.angle);
+          ctx.fillStyle = sp.color;
+          ctx.beginPath();
+          ctx.moveTo(0, -sp.r * 0.6);
+          ctx.bezierCurveTo(sp.r, -sp.r * 0.6, sp.r, sp.r * 0.7, 0, sp.r);
+          ctx.bezierCurveTo(-sp.r, sp.r * 0.7, -sp.r, -sp.r * 0.6, 0, -sp.r * 0.6);
           ctx.fill();
           ctx.restore();
         }
